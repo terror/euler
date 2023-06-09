@@ -1,4 +1,5 @@
 use {
+  chatgpt::prelude::*,
   dotenv::dotenv,
   log::info,
   rand::seq::SliceRandom,
@@ -24,8 +25,27 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(course, help, problem)]
+#[commands(ai, course, help, problem)]
 struct Commands;
+
+#[command]
+async fn ai(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+  let question = args.remains().unwrap_or_default().trim().to_string();
+
+  let client = ChatGPT::new(env::var("OPENAI_API_KEY")?)?;
+
+  msg
+    .reply(
+      ctx,
+      format!(
+        "```{}```",
+        client.send_message(question).await?.message().content
+      ),
+    )
+    .await?;
+
+  Ok(())
+}
 
 #[command]
 async fn course(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
@@ -45,6 +65,7 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
     .reply(
       ctx,
       "This bot supports the following commands:\n\
+      `!ai [question]`: Asks a question to ChatGPT and returns the response.\n\
       `!course [course code]`: Returns information about the specified course.\n\
       `!problem [difficulty]`: Returns a randomly selected LeetCode problem. \
       The optional `difficulty` parameter can be 'easy', 'medium', 'hard', or 'all' (default).\n\
