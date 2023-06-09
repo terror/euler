@@ -24,7 +24,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(course, problem)]
+#[commands(course, help, problem)]
 struct Commands;
 
 #[command]
@@ -34,6 +34,21 @@ async fn course(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
   // TODO: just call the mcgill.courses public api :)
   msg
     .reply(ctx, format!("You asked for course: {}", course_code))
+    .await?;
+
+  Ok(())
+}
+
+#[command]
+async fn help(ctx: &Context, msg: &Message) -> CommandResult {
+  msg
+    .reply(
+      ctx,
+      "This bot supports the following commands:\n\
+     `!course <course code>`: Returns information about the specified course.\n\
+     `!problem`: Returns a randomly selected LeetCode problem.\n\
+     `!help`: Displays this help message.",
+    )
     .await?;
 
   Ok(())
