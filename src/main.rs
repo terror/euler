@@ -45,9 +45,10 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
     .reply(
       ctx,
       "This bot supports the following commands:\n\
-     `!course <course code>`: Returns information about the specified course.\n\
-     `!problem`: Returns a randomly selected LeetCode problem.\n\
-     `!help`: Displays this help message.",
+      `!course [course code]`: Returns information about the specified course.\n\
+      `!problem [difficulty]`: Returns a randomly selected LeetCode problem. \
+      The optional `difficulty` parameter can be 'easy', 'medium', 'hard', or 'all' (default).\n\
+      `!help`: Displays this help message.",
     )
     .await?;
 
@@ -55,7 +56,16 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-async fn problem(ctx: &Context, msg: &Message) -> CommandResult {
+async fn problem(
+  ctx: &Context,
+  msg: &Message,
+  mut args: Args,
+) -> CommandResult {
+  let difficulty = match args.single::<String>() {
+    Ok(value) => value.to_lowercase(),
+    Err(_) => String::from("all"),
+  };
+
   let content = reqwest::get("https://leetcode.com/api/problems/all/")
     .await?
     .json::<serde_json::Value>()
@@ -65,7 +75,19 @@ async fn problem(ctx: &Context, msg: &Message) -> CommandResult {
     .as_array()
     .unwrap()
     .iter()
-    .map(|obj| obj.get("stat").unwrap().clone())
+    .filter_map(|obj| {
+      let difficulty_level = obj["difficulty"]["level"].as_i64()?;
+
+      let problem = obj["stat"].clone();
+
+      match difficulty.as_str() {
+        "easy" if difficulty_level == 1 => Some(problem),
+        "medium" if difficulty_level == 2 => Some(problem),
+        "hard" if difficulty_level == 3 => Some(problem),
+        "all" => Some(problem),
+        _ => None,
+      }
+    })
     .collect::<Vec<serde_json::Value>>();
 
   let problem = problems.choose(&mut rand::thread_rng()).unwrap();
