@@ -16,9 +16,11 @@ async fn course(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     reqwest::get(&url).await?.text().await?.as_str(),
   ));
 
-  let title = course.title()?;
-  let description = course.description()?;
-  let instructors = course.instructors()?;
+  let (title, description, instructors) = (
+    course.title()?,
+    course.description()?,
+    course.instructors()?,
+  );
 
   msg
     .channel_id

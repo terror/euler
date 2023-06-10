@@ -98,23 +98,17 @@ impl Course {
       ));
     }
 
-    let names: Vec<String> = instructors
+    let names = instructors
       .iter()
       .map(|instructor| format!("{} ({})", instructor.name, instructor.term))
-      .collect();
+      .collect::<Vec<String>>()
+      .join(", ");
 
-    let joined = names.join(", ");
-
-    if names.len() > 1 {
-      let index = joined.rfind(", ").unwrap();
-
-      Ok(format!(
-        "{} and {}.",
-        &joined[..index],
-        &joined[index + 2..]
-      ))
-    } else {
-      Ok(joined)
+    if instructors.len() > 1 {
+      let index = names.rfind(", ").unwrap();
+      return Ok(format!("{} and {}.", &names[..index], &names[index + 2..]));
     }
+
+    Ok(names)
   }
 }
