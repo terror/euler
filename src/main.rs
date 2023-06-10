@@ -1,8 +1,3 @@
-use serenity::{
-  builder::CreateMessage,
-  model::prelude::{Embed, EmbedField},
-};
-
 use {
   anyhow::anyhow,
   chatgpt::prelude::*,
@@ -151,7 +146,7 @@ impl CourseHtmlWrapper {
     )
   }
 
-  fn extract_course_instructors(&self) -> Result<Vec<Instructor>> {
+  fn instructors(&self) -> Result<String> {
     let mut instructors = Vec::new();
 
     let catalog = self.0.root_element().try_select_single(vec![
@@ -208,12 +203,6 @@ impl CourseHtmlWrapper {
           instructors.extend(inner);
         }
       });
-
-    Ok(instructors)
-  }
-
-  fn instructors(&self) -> Result<String> {
-    let instructors = self.extract_course_instructors()?;
 
     if instructors.len() == 0 {
       return Ok(String::from(
