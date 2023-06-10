@@ -1,4 +1,4 @@
-**wmt** is a discord bot for the William's Math Team™ discord server.
+**euler** is a discord bot for the William's Math Team™ discord server.
 
 ### Development
 
