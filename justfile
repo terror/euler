@@ -11,7 +11,7 @@ build:
 clippy:
   cargo clippy --all-targets --all-features
 
-deploy branch domain:
+deploy branch='master' domain='45.33.94.40':
   ssh root@{{domain}} "mkdir -p deploy \
     && apt-get update --yes \
     && apt-get upgrade --yes \
