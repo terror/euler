@@ -210,6 +210,12 @@ impl CourseHtmlWrapper {
   fn instructors(&self) -> Result<String> {
     let instructors = self.extract_course_instructors()?;
 
+    if instructors.len() == 0 {
+      return Ok(String::from(
+        "There are no instructors associated with this course.",
+      ));
+    }
+
     let names: Vec<String> = instructors
       .iter()
       .map(|instructor| format!("{} ({})", instructor.name, instructor.term))
@@ -219,9 +225,14 @@ impl CourseHtmlWrapper {
 
     if names.len() > 1 {
       let index = joined.rfind(", ").unwrap();
-      Ok(format!("{} and {}", &joined[..index], &joined[index + 2..]))
+
+      Ok(format!(
+        "Taught by {} and {}.",
+        &joined[..index],
+        &joined[index + 2..]
+      ))
     } else {
-      Ok(joined)
+      Ok(format!("Taught by {}.", joined))
     }
   }
 }
@@ -274,7 +285,7 @@ async fn course(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     .reply(
       ctx,
       format!(
-        "**{}**\n{}\n*Taught by {}*",
+        "**{}**\n{}\n*{}*",
         course_html.title()?,
         course_html.description()?,
         course_html.instructors()?,
