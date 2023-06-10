@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+touch ~/.hushlogin
+
+DOMAIN=$1
+
+hostnamectl set-hostname $DOMAIN
+
+apt-get install --yes \
+  acl \
+  clang \
+  libsqlite3-dev\
+  libssl-dev \
+  pkg-config \
+  vim
+
+if [[ ! -e ~/.cargo/env ]]; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+fi
+
+source ~/.cargo/env
+
+cargo build --release
+
+if [[ -f /usr/local/bin/euler ]]; then
+  mv /usr/local/bin/euler /usr/local/bin/euler.bak
+fi
+
+cp target/release/euler /usr/local/bin/euler
+
+id --user euler || useradd --system euler
+
+cp deploy/euler.service /etc/systemd/system/
+
+systemctl daemon-reload
+systemctl enable euler
+systemctl restart euler

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+BRANCH=$1
+DOMAIN=$2
+
+if [[ ! -d euler ]]; then
+  git clone https://github.com/terror/euler.git
+fi
+
+cd euler
+
+git fetch origin
+git checkout -B $BRANCH
+git reset --hard origin/$BRANCH
+
+./deploy/setup $DOMAIN
