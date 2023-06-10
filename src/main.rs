@@ -174,35 +174,31 @@ impl CourseHtmlWrapper {
       .collect::<Vec<&str>>()
       .join(" ");
 
-    terms
-      .join(" ")
-      .split(", ")
-      .map(|term| {
-        (
-          term.split(' ').take(1).collect::<String>(),
-          term.to_string(),
-        )
-      })
-      .for_each(|(term, full_term)| {
-        if tokens.contains(&format!("({term})")) {
-          let split = tokens.split(&format!("({term})")).collect::<Vec<&str>>();
+    for (term, full_term) in terms.join(" ").split(", ").map(|term| {
+      (
+        term.split(' ').take(1).collect::<String>(),
+        term.to_string(),
+      )
+    }) {
+      if tokens.contains(&format!("({term})")) {
+        let split = tokens.split(&format!("({term})")).collect::<Vec<&str>>();
 
-          let inner = split[0]
-            .split(';')
-            .map(|s| {
-              Instructor::default()
-                .set_name(&s.trim().split(", ").collect::<Vec<&str>>())
-                .set_term(&full_term)
-            })
-            .collect::<Vec<Instructor>>();
+        let inner = split[0]
+          .split(';')
+          .map(|s| {
+            Instructor::default()
+              .set_name(&s.trim().split(", ").collect::<Vec<&str>>())
+              .set_term(&full_term)
+          })
+          .collect::<Vec<Instructor>>();
 
-          if split.len() > 1 {
-            tokens = split[1].trim().to_string();
-          }
-
-          instructors.extend(inner);
+        if split.len() > 1 {
+          tokens = split[1].trim().to_string();
         }
-      });
+
+        instructors.extend(inner);
+      }
+    }
 
     if instructors.len() == 0 {
       return Ok(String::from(
@@ -263,16 +259,14 @@ async fn course(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 
   let base_url = format!("https://www.mcgill.ca/study/{MCGILL_TERM}/courses");
 
-  let parsed = Regex::new(r"([a-zA-Z]+)(\d+)")
-    .unwrap()
-    .replace(&course_code, "$1-$2");
+  let url = format!(
+    "{}/{}",
+    base_url,
+    Regex::new(r"([a-zA-Z]+)(\d+)")?.replace(&course_code, "$1-$2")
+  );
 
   let course_html = CourseHtmlWrapper(Html::parse_fragment(
-    reqwest::get(&format!("{}/{}", base_url, parsed))
-      .await?
-      .text()
-      .await?
-      .as_str(),
+    reqwest::get(&url).await?.text().await?.as_str(),
   ));
 
   let title = course_html.title()?;
@@ -283,11 +277,10 @@ async fn course(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     .channel_id
     .send_message(ctx, |m| {
       m.embed(|e| {
-        e.title(title).description(description).field(
-          "Instructors",
-          instructors,
-          true,
-        )
+        e.title(title)
+          .description(description)
+          .field("Instructors", instructors, true)
+          .url(url)
       })
     })
     .await?;
