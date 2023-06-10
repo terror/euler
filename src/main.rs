@@ -64,12 +64,11 @@ async fn help(ctx: &Context, msg: &Message) -> CommandResult {
   msg
     .reply(
       ctx,
-      "This bot supports the following commands:\n\
-      `!ai [question]`: Asks a question to ChatGPT and returns the response.\n\
-      `!course [course code]`: Returns information about the specified course.\n\
-      `!problem [difficulty]`: Returns a randomly selected LeetCode problem. \
-      The optional `difficulty` parameter can be 'easy', 'medium', 'hard', or 'all' (default).\n\
-      `!help`: Displays this help message.",
+      "```Available commands:\n\
+      !ai [question]: Query ChatGPT.\n\
+      !course [code]: Get information about a specific McGill course.\n\
+      !problem [difficulty]: Get information about a random leetcode problem.\n\
+      !help: Display this help message.```",
     )
     .await?;
 
