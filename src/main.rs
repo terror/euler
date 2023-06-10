@@ -18,7 +18,6 @@ use {
     },
     model::{channel::Message, gateway::Ready},
     prelude::*,
-    utils::Colour,
   },
   std::{env, process},
 };
