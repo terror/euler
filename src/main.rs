@@ -1,3 +1,8 @@
+use serenity::{
+  builder::CreateMessage,
+  model::prelude::{Embed, EmbedField},
+};
+
 use {
   anyhow::anyhow,
   chatgpt::prelude::*,
@@ -227,12 +232,12 @@ impl CourseHtmlWrapper {
       let index = joined.rfind(", ").unwrap();
 
       Ok(format!(
-        "Taught by {} and {}.",
+        "{} and {}.",
         &joined[..index],
         &joined[index + 2..]
       ))
     } else {
-      Ok(format!("Taught by {}.", joined))
+      Ok(joined)
     }
   }
 }
@@ -281,16 +286,21 @@ async fn course(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
       .as_str(),
   ));
 
+  let title = course_html.title()?;
+  let description = course_html.description()?;
+  let instructors = course_html.instructors()?;
+
   msg
-    .reply(
-      ctx,
-      format!(
-        "**{}**\n{}\n*{}*",
-        course_html.title()?,
-        course_html.description()?,
-        course_html.instructors()?,
-      ),
-    )
+    .channel_id
+    .send_message(ctx, |m| {
+      m.embed(|e| {
+        e.title(title).description(description).field(
+          "Instructors",
+          instructors,
+          true,
+        )
+      })
+    })
     .await?;
 
   Ok(())
