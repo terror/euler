@@ -4,7 +4,10 @@ use {
     instructor::Instructor, select::Select,
   },
   anyhow::anyhow,
-  chatgpt::prelude::*,
+  async_openai::types::{
+    ChatCompletionRequestMessage, ChatCompletionRequestUserMessage,
+    ChatCompletionRequestUserMessageContent, CreateChatCompletionRequestArgs,
+  },
   dotenv::dotenv,
   log::info,
   rand::seq::SliceRandom,
