@@ -28,7 +28,7 @@ mod handler;
 mod instructor;
 mod select;
 
-const MCGILL_TERM: &str = "2023-2024";
+const MCGILL_TERM: &str = "2024-2025";
 
 async fn run() -> Result {
   Ok(

@@ -6,7 +6,7 @@ touch ~/.hushlogin
 
 DOMAIN=$1
 
-hostnamectl set-hostname $DOMAIN
+hostnamectl set-hostname "$DOMAIN"
 
 apt-get install --yes \
   acl \
