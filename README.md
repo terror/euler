@@ -1,7 +1,7 @@
 ## euler
 
 <div>
-  <img align='right' width='100px' src='https://www.bbvaopenmind.com/wp-content/uploads/2018/04/Euler-1-dentro.jpg'/>
+  <img align='right' width='150px' src='https://files.catbox.moe/1zmfh9.jpg'/>
 </div>
 
 **euler** is a discord bot for the William's Math Team™ discord server.
